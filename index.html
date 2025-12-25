@@ -9,12 +9,22 @@
     <style>
         :root {
             --gold: #FFD700;
+            --gold-light: #FFE55C;
+            --gold-dark: #D4AF37;
             --silver: #C0C0C0;
+            --silver-light: #E8E8E8;
+            --silver-dark: #A0A0A0;
             --diamond: #B9F2FF;
-            --light-green: #e8f5e9;
+            --diamond-light: #E6FAFF;
+            --diamond-dark: #7FD1E0;
+            --light-green: #E8F5E9;
+            --green: #4CAF50;
             --dark-green: #2E7D32;
             --navy: #0a1a2d;
+            --navy-light: #1a3a5f;
             --star-color: #fffacd;
+            --classified-red: #d32f2f;
+            --classified-bg: rgba(211, 47, 47, 0.1);
         }
         
         * {
@@ -25,14 +35,62 @@
         
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0a1a2d 0%, #1a3a5f 100%);
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
             color: #333;
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
         }
         
-        /* Stars background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            filter: blur(40px);
+        }
+        
+        .shape-1 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            top: -200px;
+            right: -200px;
+            animation: float 20s infinite linear;
+        }
+        
+        .shape-2 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, var(--silver), var(--silver-dark));
+            bottom: -150px;
+            left: -150px;
+            animation: float 25s infinite linear reverse;
+        }
+        
+        .shape-3 {
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, var(--diamond), var(--diamond-dark));
+            top: 50%;
+            left: 10%;
+            animation: float 30s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: rotate(0deg) translate(0, 0); }
+            100% { transform: rotate(360deg) translate(20px, 20px); }
+        }
+        
         .stars {
             position: fixed;
             top: 0;
@@ -46,22 +104,21 @@
             position: absolute;
             background-color: var(--star-color);
             border-radius: 50%;
-            animation: twinkle 5s infinite;
+            animation: twinkle 3s infinite;
         }
         
         @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
         }
         
-        /* Password overlay */
         #password-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(10, 26, 45, 0.95);
+            background: rgba(10, 26, 45, 0.98);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -70,31 +127,48 @@
         }
         
         .password-container {
-            background: linear-gradient(145deg, rgba(255, 215, 0, 0.1), rgba(192, 192, 192, 0.05));
-            border: 2px solid var(--gold);
-            border-radius: 20px;
-            padding: 40px;
+            background: linear-gradient(145deg, 
+                rgba(255, 215, 0, 0.1), 
+                rgba(192, 192, 192, 0.05),
+                rgba(185, 242, 255, 0.05));
+            border: 2px solid transparent;
+            border-radius: 25px;
+            padding: 50px;
             width: 90%;
             max-width: 500px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
-                        0 0 30px rgba(255, 215, 0, 0.3),
-                        inset 0 0 20px rgba(185, 242, 255, 0.1);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5),
+                        0 0 40px rgba(255, 215, 0, 0.2),
+                        inset 0 0 30px rgba(185, 242, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-image: linear-gradient(45deg, var(--gold), var(--silver), var(--diamond)) 1;
+            animation: borderGlow 3s infinite alternate;
+        }
+        
+        @keyframes borderGlow {
+            0% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(192, 192, 192, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(185, 242, 255, 0.3); }
         }
         
         .password-container h1 {
             color: var(--diamond);
             font-family: 'Montserrat', sans-serif;
-            margin-bottom: 10px;
-            font-size: 2.2rem;
-            text-shadow: 0 0 10px rgba(185, 242, 255, 0.5);
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+            text-shadow: 0 0 15px rgba(185, 242, 255, 0.5);
+            background: linear-gradient(to right, var(--gold), var(--silver), var(--diamond));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
         }
         
-        .password-container p {
+        .password-container .tagline {
             color: var(--silver);
             margin-bottom: 30px;
             font-size: 1.1rem;
+            letter-spacing: 1px;
         }
         
         .password-input {
@@ -105,38 +179,57 @@
         }
         
         .password-input input {
-            padding: 15px;
+            padding: 18px;
             border: 2px solid var(--gold);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
             color: white;
             font-size: 1.1rem;
             text-align: center;
             transition: all 0.3s;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .password-input input:focus {
             outline: none;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--diamond);
         }
         
         .password-btn {
-            background: linear-gradient(to right, var(--gold), var(--silver));
+            background: linear-gradient(45deg, var(--gold), var(--silver));
             color: var(--navy);
             border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
+            padding: 18px 35px;
+            border-radius: 12px;
             font-size: 1.2rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
             letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
         }
         
         .password-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .password-btn:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .password-btn:hover:after {
+            left: 100%;
         }
         
         .error-message {
@@ -144,197 +237,511 @@
             margin-top: 15px;
             min-height: 20px;
             font-weight: 500;
+            font-size: 0.95rem;
         }
         
-        /* Main content */
         #main-content {
             display: none;
             padding: 20px;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            animation: contentFadeIn 0.8s ease-out;
         }
         
-        /* Header */
+        @keyframes contentFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            padding: 25px 0;
             margin-bottom: 30px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(to right, var(--gold), var(--silver), var(--diamond)) 1;
+            border-image-slice: 1;
         }
         
         .logo {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
         
         .logo-icon {
-            color: var(--gold);
-            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+        
+        .logo-icon i {
+            color: var(--navy);
+            font-size: 2rem;
         }
         
         .logo-text h1 {
             font-family: 'Montserrat', sans-serif;
-            color: var(--diamond);
-            font-size: 2rem;
+            font-size: 2.2rem;
+            background: linear-gradient(to right, var(--gold), var(--silver));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
         }
         
         .logo-text p {
             color: var(--silver);
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--silver);
+            font-size: 0.95rem;
+        }
+        
+        .user-icon {
+            background: linear-gradient(135deg, var(--diamond), var(--diamond-dark));
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-icon i {
+            color: var(--navy);
+            font-size: 1.2rem;
         }
         
         .logout-btn {
-            background: linear-gradient(to right, var(--silver), var(--diamond));
+            background: linear-gradient(45deg, var(--silver), var(--diamond));
             color: var(--navy);
             border: none;
             padding: 12px 25px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .logout-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(192, 192, 192, 0.4);
+            box-shadow: 0 8px 15px rgba(185, 242, 255, 0.3);
         }
         
-        /* Main section */
         .dashboard {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
+            gap: 40px;
+            margin-bottom: 50px;
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .dashboard {
                 grid-template-columns: 1fr;
             }
         }
         
-        .upload-section, .files-section {
+        .upload-section {
             background: rgba(232, 245, 233, 0.95);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border: 2px solid transparent;
+            border-image: linear-gradient(45deg, var(--gold), var(--green)) 1;
+            border-image-slice: 1;
+            backdrop-filter: blur(10px);
         }
         
         .section-title {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 25px;
+            gap: 15px;
+            margin-bottom: 30px;
             color: var(--dark-green);
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
         }
         
         .section-title i {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 1.8rem;
+        }
+        
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            color: var(--dark-green);
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-group label i {
             color: var(--gold);
         }
         
-        /* Upload area */
-        .upload-area {
-            border: 3px dashed var(--gold);
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 15px;
+            border: 2px solid var(--gold);
             border-radius: 10px;
-            padding: 40px 20px;
-            text-align: center;
-            margin-bottom: 25px;
-            cursor: pointer;
+            background: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
             transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.7);
         }
         
-        .upload-area:hover {
-            background: rgba(255, 255, 255, 0.9);
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
             border-color: var(--diamond);
+            box-shadow: 0 0 15px rgba(185, 242, 255, 0.3);
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .file-upload-area {
+            border: 3px dashed var(--gold);
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.8);
+            margin-top: 10px;
+        }
+        
+        .file-upload-area:hover {
+            background: white;
+            border-color: var(--diamond);
+            transform: translateY(-3px);
         }
         
         .upload-icon {
-            font-size: 3rem;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
             color: var(--silver);
-            margin-bottom: 15px;
         }
         
-        .upload-area h3 {
+        .file-upload-area h3 {
             color: var(--dark-green);
             margin-bottom: 10px;
+            font-size: 1.4rem;
         }
         
-        .upload-area p {
+        .file-upload-area p {
             color: #666;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
         }
         
         #file-input {
             display: none;
         }
         
-        .upload-btn {
-            background: linear-gradient(to right, var(--gold), var(--dark-green));
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-            font-size: 1.1rem;
+        .selected-files {
+            margin-top: 20px;
+            text-align: left;
         }
         
-        .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.4);
-        }
-        
-        /* Files list */
-        .files-list {
-            max-height: 400px;
-            overflow-y: auto;
-            margin-bottom: 25px;
-        }
-        
-        .file-item {
+        .selected-file {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 10px 15px;
             background: white;
             border-radius: 8px;
             margin-bottom: 10px;
-            border-left: 5px solid var(--gold);
-            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--green);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: #333;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 70%;
+        }
+        
+        .file-size {
+            color: #777;
+            font-size: 0.85rem;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(45deg, var(--green), var(--dark-green));
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);
+        }
+        
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .classified-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--classified-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--classified-red);
+        }
+        
+        .classified-checkbox input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .classified-checkbox label {
+            color: var(--classified-red);
+            font-weight: 600;
+        }
+        
+        .files-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border: 2px solid transparent;
+            border-image: linear-gradient(45deg, var(--silver), var(--diamond)) 1;
+            border-image-slice: 1;
+            backdrop-filter: blur(10px);
+        }
+        
+        .files-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .files-count {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: var(--navy);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .csv-download-container {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        
+        .csv-download-btn {
+            background: linear-gradient(45deg, var(--diamond), var(--green));
+            color: var(--navy);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+        
+        .csv-download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(185, 242, 255, 0.3);
+        }
+        
+        .file-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background: rgba(232, 245, 233, 0.8);
+            border: 2px solid var(--silver);
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(45deg, var(--gold), var(--gold-light));
+            border-color: var(--gold);
+            color: var(--navy);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .files-list {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 30px;
+            padding-right: 10px;
+        }
+        
+        .files-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .files-list::-webkit-scrollbar-track {
+            background: rgba(232, 245, 233, 0.5);
+            border-radius: 10px;
+        }
+        
+        .files-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border-radius: 10px;
+        }
+        
+        .file-item {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-item.classified {
+            background: var(--classified-bg);
+            border-left: 5px solid var(--classified-red);
+        }
+        
+        .file-item.classified .classified-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--classified-red);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .file-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--gold-light);
+        }
+        
+        .file-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
         }
         
         .file-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
         
         .file-icon {
-            color: var(--dark-green);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 1.5rem;
         }
         
+        .csv-icon { background: rgba(76, 175, 80, 0.1); color: var(--green); }
+        .pdf-icon { background: rgba(244, 67, 54, 0.1); color: #f44336; }
+        .doc-icon { background: rgba(33, 150, 243, 0.1); color: #2196f3; }
+        .xls-icon { background: rgba(76, 175, 80, 0.1); color: var(--green); }
+        .img-icon { background: rgba(255, 152, 0, 0.1); color: #ff9800; }
+        .zip-icon { background: rgba(158, 158, 158, 0.1); color: #9e9e9e; }
+        
         .file-details h4 {
             color: #333;
+            font-size: 1.2rem;
             margin-bottom: 5px;
+            font-weight: 600;
         }
         
-        .file-details p {
-            color: #777;
-            font-size: 0.85rem;
+        .file-meta {
+            color: #666;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .file-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .file-actions {
@@ -342,118 +749,459 @@
             gap: 10px;
         }
         
-        .download-btn, .delete-btn {
-            padding: 8px 12px;
+        .action-btn {
+            padding: 10px 15px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
             font-size: 0.9rem;
         }
         
         .download-btn {
-            background: var(--light-green);
-            color: var(--dark-green);
+            background: linear-gradient(45deg, var(--green), var(--dark-green));
+            color: white;
         }
         
         .download-btn:hover {
-            background: var(--dark-green);
-            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        .csv-btn {
+            background: linear-gradient(45deg, var(--diamond), var(--green));
+            color: var(--navy);
+        }
+        
+        .csv-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(185, 242, 255, 0.3);
         }
         
         .delete-btn {
-            background: #ffebee;
-            color: #c62828;
-        }
-        
-        .delete-btn:hover {
-            background: #c62828;
+            background: linear-gradient(45deg, #ff5252, #d32f2f);
             color: white;
         }
         
-        /* Download all section */
-        .download-all {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        .delete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(244, 67, 54, 0.3);
         }
         
-        .download-all-btn {
-            background: linear-gradient(to right, var(--diamond), var(--dark-green));
-            color: var(--navy);
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
+        .file-description {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(232, 245, 233, 0.5);
+            border-radius: 10px;
+            border-left: 4px solid var(--diamond);
+        }
+        
+        .file-item.classified .file-description {
+            background: rgba(211, 47, 47, 0.05);
+        }
+        
+        .description-title {
+            color: var(--dark-green);
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .description-text {
+            color: #555;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        
+        .uploader-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 0.85rem;
+        }
+        
+        .uploader-details {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .bulk-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 25px;
+            border-top: 2px dashed var(--silver);
+        }
+        
+        .select-all {
+            display: flex;
             align-items: center;
             gap: 10px;
         }
         
-        .download-all-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(185, 242, 255, 0.4);
+        .select-all input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
         }
         
-        /* Footer */
+        .select-all label {
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .bulk-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .bulk-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .bulk-download-btn {
+            background: linear-gradient(45deg, var(--silver), var(--diamond));
+            color: var(--navy);
+        }
+        
+        .bulk-csv-btn {
+            background: linear-gradient(45deg, var(--diamond), var(--green));
+            color: var(--navy);
+        }
+        
+        .bulk-delete-btn {
+            background: linear-gradient(45deg, #ff8a80, #d32f2f);
+            color: white;
+        }
+        
+        .bulk-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
         footer {
             text-align: center;
-            padding: 20px;
+            padding: 30px 20px;
             color: var(--silver);
-            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            border-top: 2px solid transparent;
+            border-image: linear-gradient(to right, var(--gold), var(--silver), var(--diamond)) 1;
+            border-image-slice: 1;
             margin-top: 40px;
         }
         
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
         .footer-highlight {
-            color: var(--gold);
-            font-weight: 600;
+            background: linear-gradient(to right, var(--gold), var(--diamond));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
         
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .storage-info {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
         
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        /* Notification */
         .notification {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--dark-green);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            color: #333;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             display: none;
-            z-index: 100;
-            max-width: 300px;
+            z-index: 1000;
+            max-width: 350px;
+            border-left: 5px solid var(--green);
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
         }
         
         .notification.show {
             display: block;
-            animation: fadeIn 0.3s;
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            border-left-color: #f44336;
+        }
+        
+        .notification.warning {
+            border-left-color: #ff9800;
+        }
+        
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+        
+        .notification.success .notification-icon { color: var(--green); }
+        .notification.error .notification-icon { color: #f44336; }
+        .notification.warning .notification-icon { color: #ff9800; }
+        
+        .notification-text h4 {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .notification-text p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .notification-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #777;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--silver);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 215, 0, 0.3);
+            border-top: 4px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .download-password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 26, 45, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            display: none;
+        }
+        
+        .download-password-container {
+            background: linear-gradient(145deg, 
+                rgba(255, 215, 0, 0.15), 
+                rgba(192, 192, 192, 0.1),
+                rgba(185, 242, 255, 0.1));
+            border: 2px solid transparent;
+            border-radius: 25px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6),
+                        0 0 50px rgba(255, 215, 0, 0.3),
+                        inset 0 0 30px rgba(185, 242, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-image: linear-gradient(45deg, var(--green), var(--dark-green), var(--diamond)) 1;
+            animation: borderGlow 3s infinite alternate;
+        }
+        
+        .download-password-container h3 {
+            color: var(--diamond);
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            text-shadow: 0 0 10px rgba(185, 242, 255, 0.5);
+        }
+        
+        .download-password-container p {
+            color: var(--silver);
+            margin-bottom: 25px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        
+        .download-password-input {
+            padding: 15px;
+            border: 2px solid var(--green);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .download-password-input:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--diamond);
+        }
+        
+        .download-password-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .download-password-btn {
+            background: linear-gradient(45deg, var(--green), var(--dark-green));
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            font-size: 1rem;
+        }
+        
+        .download-password-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .download-password-cancel {
+            background: linear-gradient(45deg, var(--silver), var(--silver-dark));
+            color: var(--navy);
+        }
+        
+        .download-password-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(192, 192, 192, 0.3);
+        }
+        
+        .download-password-error {
+            color: #ff6b6b;
+            margin-top: 10px;
+            min-height: 20px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .password-container {
+                padding: 30px;
+            }
+            
+            .dashboard {
+                gap: 20px;
+            }
+            
+            .upload-section,
+            .files-section {
+                padding: 25px;
+            }
+            
+            .file-item-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .file-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .bulk-actions {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .bulk-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .download-password-container {
+                padding: 30px 20px;
+            }
+            
+            .download-password-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Stars background -->
+    <div class="animated-bg">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape_3"></div>
+    </div>
+    
     <div class="stars" id="stars-container"></div>
     
-    <!-- Password overlay -->
+    <!-- Portal Access Password Overlay -->
     <div id="password-overlay">
-        <div class="password-container fade-in">
-            <h1><i class="fas fa-lock"></i> kERR FINDERS PORTAL</h1>
-            <p>Enter the secure password to access the file management system</p>
+        <div class="password-container">
+            <h1><i class="fas fa-crown"></i> KERR FINDERS</h1>
+            <p class="tagline">Secure File Portal - Professional Access Only</p>
             
             <div class="password-input">
-                <input type="password" id="password-input" placeholder="Enter password" autocomplete="off">
+                <input type="password" id="password-input" placeholder="Enter portal password" autocomplete="off">
                 <button class="password-btn" id="login-btn">
                     <i class="fas fa-unlock-alt"></i> Access Portal
                 </button>
@@ -461,13 +1209,33 @@
             
             <div class="error-message" id="password-error"></div>
             
-            <div style="margin-top: 30px; color: var(--silver); font-size: 0.9rem;">
-                <p><i class="fas fa-info-circle"></i> Use password: <strong>gambia@2025</strong> to access</p>
-            </div>
+            <!-- PASSWORD HINT SECTION REMOVED HERE -->
         </div>
     </div>
     
-    <!-- Main content (hidden until password is entered) -->
+    <!-- Download Password Overlay -->
+    <div class="download-password-overlay" id="download-password-overlay">
+        <div class="download-password-container">
+            <h3><i class="fas fa-download"></i> Download Authorization</h3>
+            <p>To download files, please enter the download password. This ensures only authorized users can access sensitive files.</p>
+            
+            <input type="password" id="download-password-input" placeholder="Enter download password" autocomplete="off" class="download-password-input">
+            
+            <div class="download-password-buttons">
+                <button class="download-password-btn" id="confirm-download-btn">
+                    <i class="fas fa-check"></i> Confirm & Download
+                </button>
+                <button class="download-password-btn download-password-cancel" id="cancel-download-btn">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+            
+            <div class="download-password-error" id="download-password-error"></div>
+            
+            <!-- DOWNLOAD PASSWORD HINT SECTION REMOVED HERE -->
+        </div>
+    </div>
+    
     <div id="main-content">
         <header>
             <div class="logo">
@@ -476,7 +1244,17 @@
                 </div>
                 <div class="logo-text">
                     <h1>KERR FINDERS</h1>
-                    <p>Secure File Management Portal</p>
+                    <p>Professional File Management System</p>
+                </div>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div>
+                    <p id="current-user">Portal Access: Active</p>
+                    <p id="current-org">User: <span id="user-name">Guest</span></p>
                 </div>
             </div>
             
@@ -491,480 +1269,1191 @@
                     <i class="fas fa-cloud-upload-alt"></i> Upload Files
                 </h2>
                 
-                <div class="upload-area" id="upload-area">
-                    <div class="upload-icon">
-                        <i class="fas fa-file-csv"></i>
+                <form id="upload-form" class="upload-form">
+                    <div class="form-group">
+                        <label for="uploader-name"><i class="fas fa-user"></i> Your Name</label>
+                        <input type="text" id="uploader-name" placeholder="Enter your full name" required>
                     </div>
-                    <h3>Drag & Drop Files Here</h3>
-                    <p>or click to browse (CSV, Excel, PDF, etc.)</p>
-                    <p style="margin-top: 10px; font-size: 0.8rem; color: #888;">
-                        Max file size: 10MB per file
-                    </p>
-                </div>
-                
-                <input type="file" id="file-input" multiple>
-                
-                <button class="upload-btn" id="upload-btn">
-                    <i class="fas fa-upload"></i> Upload Selected Files
-                </button>
-                
-                <div style="margin-top: 20px; color: #666; font-size: 0.9rem;">
-                    <p><i class="fas fa-lightbulb"></i> All uploaded files will be available for download as CSV</p>
-                </div>
+                    
+                    <div class="form-group">
+                        <label for="uploader-org"><i class="fas fa-building"></i> Organization</label>
+                        <input type="text" id="uploader-org" placeholder="Enter your organization" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="file-purpose"><i class="fas fa-bullseye"></i> File Purpose</label>
+                        <select id="file-purpose" required>
+                            <option value="">Select purpose</option>
+                            <option value="Financial Reports">Financial Reports</option>
+                            <option value="Client Documents">Client Documents</option>
+                            <option value="Project Files">Project Files</option>
+                            <option value="Team Reports">Team Reports</option>
+                            <option value="Compliance">Compliance Documents</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="file-description"><i class="fas fa-align-left"></i> Description</label>
+                        <textarea id="file-description" placeholder="Describe the file contents..." required></textarea>
+                    </div>
+                    
+                    <div class="classified-checkbox">
+                        <input type="checkbox" id="file-classified">
+                        <label for="file-classified"><i class="fas fa-lock"></i> Mark as Classified/Sensitive</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-file-upload"></i> Select File</label>
+                        <div class="file-upload-area" id="file-upload-area">
+                            <div class="upload-icon">
+                                <i class="fas fa-file-csv"></i>
+                            </div>
+                            <h3>Drag & Drop Files Here</h3>
+                            <p>or click to browse (CSV, Excel, PDF, Images, etc.)</p>
+                            <p style="margin-top: 10px; font-size: 0.85rem; color: #888;">
+                                Maximum file size: 50MB per file
+                            </p>
+                            <input type="file" id="file-input" multiple>
+                        </div>
+                        
+                        <div class="selected-files" id="selected-files"></div>
+                    </div>
+                    
+                    <button type="submit" class="upload-btn" id="submit-upload" disabled>
+                        <i class="fas fa-upload"></i> Upload File
+                    </button>
+                </form>
             </section>
             
             <section class="files-section">
-                <h2 class="section-title">
-                    <i class="fas fa-folder-open"></i> Uploaded Files
-                </h2>
+                <div class="files-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-folder-open"></i> Uploaded Files
+                    </h2>
+                    <div class="files-count" id="files-count">0 Files</div>
+                </div>
+                
+                <div class="file-filters">
+                    <button class="filter-btn active" data-filter="all">All Files</button>
+                    <button class="filter-btn" data-filter="classified">Classified Only</button>
+                    <button class="filter-btn" data-filter="csv">CSV Files</button>
+                </div>
+                
+                <div class="csv-download-container">
+                    <button class="csv-download-btn" id="export-all-csv">
+                        <i class="fas fa-file-csv"></i> Export All Files to CSV
+                    </button>
+                </div>
+                
+                <div class="loading" id="loading-files">
+                    <div class="spinner"></div>
+                    <p>Loading files...</p>
+                </div>
                 
                 <div class="files-list" id="files-list">
-                    <!-- Files will be dynamically added here -->
-                    <div class="file-item" style="opacity: 0.7;">
-                        <div class="file-info">
-                            <div class="file-icon">
-                                <i class="fas fa-file-csv"></i>
-                            </div>
-                            <div class="file-details">
-                                <h4>sample-employees.csv</h4>
-                                <p>Uploaded: Demo file • Size: 2.4 KB</p>
-                            </div>
-                        </div>
-                        <div class="file-actions">
-                            <button class="download-btn">
-                                <i class="fas fa-download"></i> Download
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="file-item" style="opacity: 0.7;">
-                        <div class="file-info">
-                            <div class="file-icon">
-                                <i class="fas fa-file-excel"></i>
-                            </div>
-                            <div class="file-details">
-                                <h4>project-timeline.xlsx</h4>
-                                <p>Uploaded: Demo file • Size: 5.1 KB</p>
-                            </div>
-                        </div>
-                        <div class="file-actions">
-                            <button class="download-btn">
-                                <i class="fas fa-download"></i> Download
-                            </button>
-                        </div>
+                    <div class="empty-state" id="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h3>No files uploaded yet</h3>
+                        <p>Upload your first file using the form on the left</p>
                     </div>
                 </div>
                 
-                <div class="download-all">
-                    <button class="download-all-btn" id="download-all-btn">
-                        <i class="fas fa-file-archive"></i> Download All as CSV
-                    </button>
+                <div class="bulk-actions" id="bulk-actions" style="display: none;">
+                    <div class="select-all">
+                        <input type="checkbox" id="select-all-files">
+                        <label for="select-all-files">Select All Files</label>
+                    </div>
+                    
+                    <div class="bulk-buttons">
+                        <button class="bulk-btn bulk-download-btn" id="bulk-download">
+                            <i class="fas fa-download"></i> Download Selected
+                        </button>
+                        <button class="bulk-btn bulk-csv-btn" id="bulk-csv">
+                            <i class="fas fa-file-csv"></i> Export Selected to CSV
+                        </button>
+                        <button class="bulk-btn bulk-delete-btn" id="bulk-delete">
+                            <i class="fas fa-trash"></i> Delete Selected
+                        </button>
+                    </div>
                 </div>
             </section>
         </main>
         
         <footer>
-            <p>&copy; 2025 KERR FINDERS. All rights reserved.</p>
-            <p>Secure file portal for team members and employees | Password: <span class="footer-highlight">gambia@2025</span></p>
+            <div class="footer-content">
+                <p>&copy; 2025 KERR FINDERS. All Rights Reserved.</p>
+                <p>Professional file portal with secure access | CSV download functionality enabled</p>
+                <p class="storage-info">
+                    <i class="fas fa-database"></i> Unlimited Storage Available | 
+                    <i class="fas fa-shield-alt"></i> Dual Password Protection | 
+                    <i class="fas fa-file-csv"></i> CSV Export Functionality |
+                    <i class="fas fa-lock"></i> Classified Files Support
+                </p>
+            </div>
         </footer>
     </div>
     
-    <!-- Notification -->
-    <div class="notification" id="notification"></div>
+    <div class="notification" id="notification">
+        <button class="notification-close" id="notification-close">&times;</button>
+        <div class="notification-content">
+            <div class="notification-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="notification-text">
+                <h4 id="notification-title">Success</h4>
+                <p id="notification-message">Operation completed successfully</p>
+            </div>
+        </div>
+    </div>
     
     <script>
-        // Create stars for background
+        // ========== PASSWORD CONFIGURATION ==========
+        const PASSWORDS = {
+            PORTAL: "gambia@2025",          // For accessing the portal
+            DOWNLOAD: "gambia@@2025"        // For downloading files
+        };
+        // ============================================
+        
+        const CONFIG = {
+            STORAGE_KEY: "KERR FINDERS_files",
+            MAX_FILE_SIZE: 50 * 1024 * 1024,
+            ALLOWED_TYPES: [
+                'text/csv',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/pdf',
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'application/zip',
+                'application/x-zip-compressed',
+                'text/plain',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ]
+        };
+        
+        let state = {
+            currentUser: null,
+            currentOrg: null,
+            isAuthenticated: false,
+            selectedFiles: [],
+            uploadedFiles: [],
+            allFilesSelected: false,
+            currentFilter: 'all',
+            downloadPasswordVerified: false,
+            pendingDownloadAction: null, // Store download function to execute after password verification
+            pendingDownloadParams: null  // Store parameters for the download function
+        };
+        
+        const elements = {
+            passwordOverlay: document.getElementById('password-overlay'),
+            mainContent: document.getElementById('main-content'),
+            passwordInput: document.getElementById('password-input'),
+            loginBtn: document.getElementById('login-btn'),
+            passwordError: document.getElementById('password-error'),
+            logoutBtn: document.getElementById('logout-btn'),
+            exportAllCsv: document.getElementById('export-all-csv'),
+            uploadForm: document.getElementById('upload-form'),
+            fileInput: document.getElementById('file-input'),
+            fileUploadArea: document.getElementById('file-upload-area'),
+            selectedFilesContainer: document.getElementById('selected-files'),
+            submitUpload: document.getElementById('submit-upload'),
+            filesList: document.getElementById('files-list'),
+            emptyState: document.getElementById('empty-state'),
+            loadingFiles: document.getElementById('loading-files'),
+            filesCount: document.getElementById('files-count'),
+            bulkActions: document.getElementById('bulk-actions'),
+            selectAllFiles: document.getElementById('select-all-files'),
+            bulkDownload: document.getElementById('bulk-download'),
+            bulkCsv: document.getElementById('bulk-csv'),
+            bulkDelete: document.getElementById('bulk-delete'),
+            notification: document.getElementById('notification'),
+            notificationClose: document.getElementById('notification-close'),
+            notificationTitle: document.getElementById('notification-title'),
+            notificationMessage: document.getElementById('notification-message'),
+            currentUserDisplay: document.getElementById('current-user'),
+            userNameDisplay: document.getElementById('user-name'),
+            fileClassified: document.getElementById('file-classified'),
+            // Download password elements
+            downloadPasswordOverlay: document.getElementById('download-password-overlay'),
+            downloadPasswordInput: document.getElementById('download-password-input'),
+            confirmDownloadBtn: document.getElementById('confirm-download-btn'),
+            cancelDownloadBtn: document.getElementById('cancel-download-btn'),
+            downloadPasswordError: document.getElementById('download-password-error')
+        };
+        
         function createStars() {
             const starsContainer = document.getElementById('stars-container');
-            const starsCount = 100;
+            const starsCount = 150;
             
             for (let i = 0; i < starsCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
-                
-                // Random size
                 const size = Math.random() * 3 + 1;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
-                
-                // Random position
                 star.style.left = `${Math.random() * 100}%`;
                 star.style.top = `${Math.random() * 100}%`;
-                
-                // Random animation delay
                 star.style.animationDelay = `${Math.random() * 5}s`;
-                
+                star.style.animationDuration = `${Math.random() * 3 + 2}s`;
                 starsContainer.appendChild(star);
             }
         }
         
-        // Password protection
-        const PASSWORD = "gambia@2025";
-        const passwordOverlay = document.getElementById('password-overlay');
-        const mainContent = document.getElementById('main-content');
-        const passwordInput = document.getElementById('password-input');
-        const loginBtn = document.getElementById('login-btn');
-        const passwordError = document.getElementById('password-error');
-        const logoutBtn = document.getElementById('logout-btn');
-        
-        // Check if already logged in
-        if (sessionStorage.getItem('webcredLoggedIn') === 'true') {
-            passwordOverlay.style.display = 'none';
-            mainContent.style.display = 'block';
-            createStars();
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
         
-        // Login function
-        function login() {
-            const enteredPassword = passwordInput.value;
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (ext === 'csv') return 'csv-icon fas fa-file-csv';
+            if (ext === 'pdf') return 'pdf-icon fas fa-file-pdf';
+            if (['doc', 'docx'].includes(ext)) return 'doc-icon fas fa-file-word';
+            if (['xls', 'xlsx'].includes(ext)) return 'xls-icon fas fa-file-excel';
+            if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(ext)) return 'img-icon fas fa-file-image';
+            if (['zip', 'rar', '7z'].includes(ext)) return 'zip-icon fas fa-file-archive';
+            return 'fas fa-file';
+        }
+        
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (ext === 'csv') return 'CSV';
+            if (ext === 'pdf') return 'PDF';
+            if (['doc', 'docx'].includes(ext)) return 'Word Document';
+            if (['xls', 'xlsx'].includes(ext)) return 'Excel Spreadsheet';
+            if (['jpg', 'jpeg'].includes(ext)) return 'JPEG Image';
+            if (ext === 'png') return 'PNG Image';
+            if (ext === 'gif') return 'GIF Image';
+            if (['zip', 'rar', '7z'].includes(ext)) return 'Archive';
+            return 'File';
+        }
+        
+        function showNotification(title, message, type = 'success') {
+            elements.notificationTitle.textContent = title;
+            elements.notificationMessage.textContent = message;
+            elements.notification.className = `notification ${type} show`;
             
-            if (enteredPassword === PASSWORD) {
-                // Hide password overlay and show main content
-                passwordOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    passwordOverlay.style.display = 'none';
-                    mainContent.style.display = 'block';
-                    createStars();
-                    
-                    // Add fade-in animation
-                    mainContent.classList.add('fade-in');
-                    
-                    // Set session storage
-                    sessionStorage.setItem('webcredLoggedIn', 'true');
-                }, 300);
-            } else {
-                // Show error
-                passwordError.textContent = "Incorrect password. Please try again.";
-                passwordInput.style.borderColor = "#ff6b6b";
+            setTimeout(() => {
+                hideNotification();
+            }, 5000);
+        }
+        
+        function hideNotification() {
+            elements.notification.classList.remove('show');
+        }
+        
+        function formatDate(date) {
+            return new Date(date).toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+        
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(reader.error);
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function downloadCSV(files, filename = 'webcred_files') {
+            if (files.length === 0) {
+                showNotification('No Files', 'No files to export', 'warning');
+                return;
+            }
+            
+            const headers = [
+                'File Name',
+                'Uploader Name',
+                'Organization',
+                'Purpose',
+                'Description',
+                'File Type',
+                'File Size',
+                'Upload Date',
+                'Classified'
+            ];
+            
+            let csvContent = headers.join(',') + '\n';
+            
+            files.forEach(file => {
+                const row = [
+                    `"${file.name.replace(/"/g, '""')}"`,
+                    `"${file.uploaderName.replace(/"/g, '""')}"`,
+                    `"${file.organization.replace(/"/g, '""')}"`,
+                    `"${file.purpose.replace(/"/g, '""')}"`,
+                    `"${file.description.replace(/"/g, '""')}"`,
+                    `"${getFileType(file.name)}"`,
+                    `"${formatFileSize(file.size)}"`,
+                    `"${formatDate(file.uploadedAt)}"`,
+                    `"${file.classified ? 'YES' : 'NO'}"`
+                ].join(',');
                 
-                // Shake animation
-                passwordInput.style.animation = 'none';
+                csvContent += row + '\n';
+            });
+            
+            const encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `${filename}_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('CSV Downloaded', `${files.length} files exported to CSV`, 'success');
+        }
+        
+        function exportSingleFileCSV(fileId) {
+            const file = state.uploadedFiles.find(f => f.id === fileId);
+            if (file) {
+                downloadCSV([file], `file_${file.name.replace(/\.[^/.]+$/, '')}`);
+            }
+        }
+        
+        function exportSelectedFilesCSV() {
+            if (state.selectedFiles.length === 0) {
+                showNotification('No Selection', 'Please select files for CSV export', 'warning');
+                return;
+            }
+            
+            const filesToExport = state.uploadedFiles.filter(file => 
+                state.selectedFiles.includes(file.id)
+            );
+            
+            downloadCSV(filesToExport, 'webcred_selected_files');
+        }
+        
+        function exportAllFilesCSV() {
+            let filesToExport = state.uploadedFiles;
+            
+            if (state.currentFilter === 'classified') {
+                filesToExport = filesToExport.filter(file => file.classified);
+            } else if (state.currentFilter === 'csv') {
+                filesToExport = filesToExport.filter(file => file.name.toLowerCase().endsWith('.csv'));
+            }
+            
+            if (filesToExport.length === 0) {
+                showNotification('No Files', 'No files to export', 'warning');
+                return;
+            }
+            
+            downloadCSV(filesToExport, 'webcred_all_files');
+        }
+        
+        // ========== PASSWORD VERIFICATION FUNCTIONS ==========
+        
+        function checkAuth() {
+            const isLoggedIn = sessionStorage.getItem('webcred_logged_in') === 'true';
+            const user = sessionStorage.getItem('webcred_user');
+            const org = sessionStorage.getItem('webcred_org');
+            
+            if (isLoggedIn && user && org) {
+                state.isAuthenticated = true;
+                state.currentUser = user;
+                state.currentOrg = org;
+                
+                elements.passwordOverlay.style.display = 'none';
+                elements.mainContent.style.display = 'block';
+                createStars();
+                updateUserDisplay();
+                loadFiles();
+                return true;
+            }
+            return false;
+        }
+        
+        function login() {
+            const password = elements.passwordInput.value.trim();
+            
+            // Changed from PASSWORDS.DOWNLOAD to PASSWORDS.PORTAL
+            if (password === PASSWORDS.PORTAL) {
+                const userName = document.getElementById('uploader-name').value || 'WebCred User';
+                const userOrg = document.getElementById('uploader-org').value || 'WebCred Solutions';
+                
+                state.isAuthenticated = true;
+                state.currentUser = userName;
+                state.currentOrg = userOrg;
+                
+                sessionStorage.setItem('webcred_logged_in', 'true');
+                sessionStorage.setItem('webcred_user', userName);
+                sessionStorage.setItem('webcred_org', userOrg);
+                
+                elements.passwordOverlay.style.opacity = '0';
                 setTimeout(() => {
-                    passwordInput.style.animation = 'shake 0.5s';
+                    elements.passwordOverlay.style.display = 'none';
+                    elements.mainContent.style.display = 'block';
+                    createStars();
+                    updateUserDisplay();
+                    loadFiles();
+                    showNotification('Access Granted', 'Welcome to WebCred Solutions', 'success');
+                }, 300);
+                
+                elements.passwordInput.value = '';
+                elements.passwordError.textContent = '';
+            } else {
+                elements.passwordError.textContent = "Invalid password";
+                elements.passwordInput.style.borderColor = "#ff6b6b";
+                elements.passwordInput.style.animation = 'none';
+                setTimeout(() => {
+                    elements.passwordInput.style.animation = 'shake 0.5s';
                 }, 10);
                 
-                // Clear input after a delay
                 setTimeout(() => {
-                    passwordInput.value = '';
-                    passwordInput.focus();
+                    elements.passwordInput.value = '';
+                    elements.passwordInput.focus();
                 }, 1500);
             }
         }
         
-        // Logout function
-        function logout() {
-            sessionStorage.removeItem('webcredLoggedIn');
-            mainContent.style.display = 'none';
-            passwordOverlay.style.display = 'flex';
-            passwordOverlay.style.opacity = '1';
-            passwordInput.value = '';
-            passwordError.textContent = '';
-            passwordInput.style.borderColor = 'var(--gold)';
+        function showDownloadPasswordOverlay(downloadAction, params = null) {
+            state.pendingDownloadAction = downloadAction;
+            state.pendingDownloadParams = params;
+            state.downloadPasswordVerified = false;
             
-            // Clear any uploaded files from demo
-            clearFileList();
+            elements.downloadPasswordInput.value = '';
+            elements.downloadPasswordError.textContent = '';
+            elements.downloadPasswordOverlay.style.display = 'flex';
+            elements.downloadPasswordInput.focus();
         }
         
-        // Event listeners for password
-        loginBtn.addEventListener('click', login);
-        
-        passwordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                login();
-            }
-        });
-        
-        logoutBtn.addEventListener('click', logout);
-        
-        // File upload functionality
-        const fileInput = document.getElementById('file-input');
-        const uploadArea = document.getElementById('upload-area');
-        const uploadBtn = document.getElementById('upload-btn');
-        const filesList = document.getElementById('files-list');
-        const downloadAllBtn = document.getElementById('download-all-btn');
-        const notification = document.getElementById('notification');
-        
-        // Files data storage (in a real app, this would be server-side)
-        let uploadedFiles = [
-            {
-                id: 1,
-                name: "sample-employees.csv",
-                type: "csv",
-                size: "2.4 KB",
-                uploadDate: "Demo file",
-                content: "Name,Role,Department,Join Date\nJohn Smith,Developer,IT,2023-01-15\nSarah Johnson,Manager,HR,2022-05-20\nMichael Lee,Analyst,Finance,2023-03-10"
-            },
-            {
-                id: 2,
-                name: "project-timeline.xlsx",
-                type: "excel",
-                size: "5.1 KB",
-                uploadDate: "Demo file",
-                content: "Project,Start Date,End Date,Status\nWebsite Redesign,2023-06-01,2023-08-30,In Progress\nMobile App,2023-07-15,2023-10-31,Planning\nCRM Integration,2023-05-10,2023-09-15,Completed"
-            }
-        ];
-        
-        // Display files in the list
-        function renderFileList() {
-            filesList.innerHTML = '';
-            
-            uploadedFiles.forEach(file => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item fade-in';
-                fileItem.dataset.id = file.id;
-                
-                let fileIcon = 'fa-file';
-                if (file.type === 'csv') fileIcon = 'fa-file-csv';
-                else if (file.type === 'excel') fileIcon = 'fa-file-excel';
-                else if (file.type === 'pdf') fileIcon = 'fa-file-pdf';
-                else if (file.type === 'image') fileIcon = 'fa-file-image';
-                
-                fileItem.innerHTML = `
-                    <div class="file-info">
-                        <div class="file-icon">
-                            <i class="fas ${fileIcon}"></i>
-                        </div>
-                        <div class="file-details">
-                            <h4>${file.name}</h4>
-                            <p>Uploaded: ${file.uploadDate} • Size: ${file.size}</p>
-                        </div>
-                    </div>
-                    <div class="file-actions">
-                        <button class="download-btn" onclick="downloadFile(${file.id})">
-                            <i class="fas fa-download"></i> Download
-                        </button>
-                        <button class="delete-btn" onclick="deleteFile(${file.id})">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </div>
-                `;
-                
-                filesList.appendChild(fileItem);
-            });
-            
-            // If no files, show message
-            if (uploadedFiles.length === 0) {
-                filesList.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: #777;">
-                        <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                        <h3>No files uploaded yet</h3>
-                        <p>Upload your first file using the panel on the left</p>
-                    </div>
-                `;
-            }
+        function hideDownloadPasswordOverlay() {
+            elements.downloadPasswordOverlay.style.display = 'none';
+            state.pendingDownloadAction = null;
+            state.pendingDownloadParams = null;
+            elements.downloadPasswordInput.value = '';
+            elements.downloadPasswordError.textContent = '';
         }
         
-        // Clear file list (for demo reset)
-        function clearFileList() {
-            uploadedFiles = uploadedFiles.filter(file => file.uploadDate === "Demo file");
-            renderFileList();
-        }
-        
-        // Download file
-        function downloadFile(fileId) {
-            const file = uploadedFiles.find(f => f.id === fileId);
-            if (!file) return;
+        function verifyDownloadPassword() {
+            const password = elements.downloadPasswordInput.value.trim();
             
-            let content = file.content;
-            let fileName = file.name;
-            
-            // If it's not a CSV file, convert to CSV
-            if (!fileName.toLowerCase().endsWith('.csv')) {
-                fileName = fileName.replace(/\.[^/.]+$/, "") + '.csv';
+            if (password === PASSWORDS.DOWNLOAD) {
+                state.downloadPasswordVerified = true;
+                hideDownloadPasswordOverlay();
                 
-                // Simple conversion for demo
-                if (file.type === 'excel') {
-                    content = "Project,Start Date,End Date,Status\nWebsite Redesign,2023-06-01,2023-08-30,In Progress\nMobile App,2023-07-15,2023-10-31,Planning";
-                } else {
-                    content = "Column1,Column2,Column3\nData1,Data2,Data3\nData4,Data5,Data6";
+                // Execute the pending download action
+                if (state.pendingDownloadAction) {
+                    if (state.pendingDownloadParams) {
+                        state.pendingDownloadAction(state.pendingDownloadParams);
+                    } else {
+                        state.pendingDownloadAction();
+                    }
                 }
-            }
-            
-            // Create blob and download link
-            const blob = new Blob([content], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            // Show notification
-            showNotification(`Downloaded: ${fileName}`);
-        }
-        
-        // Delete file
-        function deleteFile(fileId) {
-            if (confirm("Are you sure you want to delete this file?")) {
-                uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
-                renderFileList();
-                showNotification("File deleted successfully");
+                
+                // Reset after a delay
+                setTimeout(() => {
+                    state.downloadPasswordVerified = false;
+                }, 300000); // Password stays valid for 5 minutes
+                
+                return true;
+            } else {
+                elements.downloadPasswordError.textContent = "Invalid download password";
+                elements.downloadPasswordInput.style.borderColor = "#ff6b6b";
+                elements.downloadPasswordInput.style.animation = 'none';
+                setTimeout(() => {
+                    elements.downloadPasswordInput.style.animation = 'shake 0.5s';
+                }, 10);
+                
+                setTimeout(() => {
+                    elements.downloadPasswordInput.value = '';
+                    elements.downloadPasswordInput.focus();
+                }, 1500);
+                return false;
             }
         }
         
-        // Upload file
-        function uploadFile(file) {
-            // Check file size (10MB max for demo)
-            if (file.size > 10 * 1024 * 1024) {
-                showNotification("File size exceeds 10MB limit", "error");
+        // ========== MODIFIED DOWNLOAD FUNCTIONS WITH PASSWORD CHECK ==========
+        
+        function downloadFileNow(fileId) {
+            // Check if download password is already verified
+            if (state.downloadPasswordVerified) {
+                executeDownloadFile(fileId);
+            } else {
+                showDownloadPasswordOverlay(executeDownloadFile, fileId);
+            }
+        }
+        
+        function executeDownloadFile(fileId) {
+            const file = state.uploadedFiles.find(f => f.id === fileId);
+            if (!file) {
+                showNotification('Error', 'File not found', 'error');
                 return;
             }
             
-            // Create a new file object
-            const fileType = file.name.split('.').pop().toLowerCase();
-            let type = 'other';
-            
-            if (fileType === 'csv') type = 'csv';
-            else if (['xls', 'xlsx'].includes(fileType)) type = 'excel';
-            else if (fileType === 'pdf') type = 'pdf';
-            else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) type = 'image';
-            
-            const newFile = {
-                id: uploadedFiles.length + 1,
-                name: file.name,
-                type: type,
-                size: formatFileSize(file.size),
-                uploadDate: new Date().toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric' 
-                }),
-                content: "File content would be processed here. In a real application, this would contain the actual file data."
-            };
-            
-            // Add to uploaded files
-            uploadedFiles.push(newFile);
-            renderFileList();
-            
-            // Show success notification
-            showNotification(`Uploaded: ${file.name}`);
+            try {
+                if (file.content) {
+                    const link = document.createElement('a');
+                    link.href = file.content;
+                    link.download = file.name;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    const content = `WebCred Solutions - File Information\n\n` +
+                                   `File Name: ${file.name}\n` +
+                                   `Uploaded By: ${file.uploaderName}\n` +
+                                   `Organization: ${file.organization}\n` +
+                                   `Purpose: ${file.purpose}\n` +
+                                   `Description: ${file.description}\n` +
+                                   `Classified: ${file.classified ? 'YES' : 'NO'}\n` +
+                                   `Upload Date: ${formatDate(file.uploadedAt)}\n` +
+                                   `File Size: ${formatFileSize(file.size)}`;
+                    
+                    const encodedUri = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+                    const link = document.createElement('a');
+                    link.setAttribute('href', encodedUri);
+                    link.setAttribute('download', file.name.endsWith('.txt') ? file.name : `${file.name}.txt`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+                
+                showNotification('Download Started', `Downloading "${file.name}"`, 'success');
+            } catch (error) {
+                console.error('Download error:', error);
+                showNotification('Download Error', 'Failed to download file', 'error');
+            }
         }
         
-        // Download all files as CSV
-        function downloadAllAsCSV() {
-            if (uploadedFiles.length === 0) {
-                showNotification("No files to download", "error");
+        function bulkDownload() {
+            if (state.downloadPasswordVerified) {
+                executeBulkDownload();
+            } else {
+                showDownloadPasswordOverlay(executeBulkDownload);
+            }
+        }
+        
+        function executeBulkDownload() {
+            let filesToDownload = state.uploadedFiles.filter(file => 
+                state.selectedFiles.includes(file.id)
+            );
+            
+            if (filesToDownload.length === 0) {
+                showNotification('No Selection', 'Please select files to download', 'warning');
                 return;
             }
             
-            // Create a combined CSV content
-            let csvContent = "File Name,Type,Size,Upload Date\n";
-            
-            uploadedFiles.forEach(file => {
-                csvContent += `"${file.name}","${file.type}","${file.size}","${file.uploadDate}"\n`;
-            });
-            
-            // Create blob and download link
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `webcred-files-${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            // Show notification
-            showNotification(`Downloaded ${uploadedFiles.length} files as CSV`);
-        }
-        
-        // Format file size
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-        
-        // Show notification
-        function showNotification(message, type = "success") {
-            notification.textContent = message;
-            notification.className = `notification show`;
-            
-            if (type === "error") {
-                notification.style.background = "#c62828";
-            } else if (type === "success") {
-                notification.style.background = "var(--dark-green)";
-            }
+            showNotification('Preparing Download', `Preparing ${filesToDownload.length} files`, 'success');
             
             setTimeout(() => {
-                notification.className = "notification";
-            }, 3000);
+                let content = `KERR FINDERS - File Export\n\n`;
+                content += `Export Date: ${new Date().toLocaleString()}\n`;
+                content += `Total Files: ${filesToDownload.length}\n\n`;
+                
+                filesToDownload.forEach((file, index) => {
+                    content += `FILE ${index + 1}: ${file.name}\n`;
+                    content += `Uploaded By: ${file.uploaderName}\n`;
+                    content += `Organization: ${file.organization}\n`;
+                    content += `Purpose: ${file.purpose}\n`;
+                    content += `Description: ${file.description}\n`;
+                    content += `Classified: ${file.classified ? 'YES' : 'NO'}\n`;
+                    content += `Upload Date: ${formatDate(file.uploadedAt)}\n`;
+                    content += `File Size: ${formatFileSize(file.size)}\n`;
+                    content += '─'.repeat(50) + '\n\n';
+                });
+                
+                const encodedUri = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', `webcred_export_${new Date().toISOString().split('T')[0]}.txt`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showNotification('Download Complete', `${filesToDownload.length} files downloaded`, 'success');
+            }, 1000);
         }
         
-        // Event listeners for file upload
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
+        // CSV exports also require download password
+        function exportSingleFileCSVWithPassword(fileId) {
+            if (state.downloadPasswordVerified) {
+                exportSingleFileCSV(fileId);
+            } else {
+                showDownloadPasswordOverlay(exportSingleFileCSV, fileId);
+            }
+        }
         
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = "var(--diamond)";
-            uploadArea.style.background = "rgba(255, 255, 255, 0.95)";
-        });
+        function exportSelectedFilesCSVWithPassword() {
+            if (state.downloadPasswordVerified) {
+                exportSelectedFilesCSV();
+            } else {
+                showDownloadPasswordOverlay(exportSelectedFilesCSV);
+            }
+        }
         
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.borderColor = "var(--gold)";
-            uploadArea.style.background = "rgba(255, 255, 255, 0.7)";
-        });
+        function exportAllFilesCSVWithPassword() {
+            if (state.downloadPasswordVerified) {
+                exportAllFilesCSV();
+            } else {
+                showDownloadPasswordOverlay(exportAllFilesCSV);
+            }
+        }
         
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = "var(--gold)";
-            uploadArea.style.background = "rgba(255, 255, 255, 0.7)";
+        // ========== END OF MODIFIED DOWNLOAD FUNCTIONS ==========
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('webcred_logged_in');
+                sessionStorage.removeItem('webcred_user');
+                sessionStorage.removeItem('webcred_org');
+                
+                state.isAuthenticated = false;
+                state.currentUser = null;
+                state.currentOrg = null;
+                state.selectedFiles = [];
+                state.downloadPasswordVerified = false;
+                
+                elements.mainContent.style.display = 'none';
+                elements.passwordOverlay.style.display = 'flex';
+                elements.passwordOverlay.style.opacity = '1';
+                elements.passwordInput.value = '';
+                elements.passwordError.textContent = '';
+                elements.passwordInput.style.borderColor = 'var(--gold)';
+                
+                resetUploadForm();
+                showNotification('Logged Out', 'You have been logged out', 'success');
+            }
+        }
+        
+        function updateUserDisplay() {
+            if (state.currentUser) {
+                elements.currentUserDisplay.textContent = `Portal Access: Active`;
+                elements.userNameDisplay.textContent = state.currentUser;
+            }
+        }
+        
+        function loadFiles() {
+            elements.loadingFiles.style.display = 'block';
+            elements.emptyState.style.display = 'none';
             
-            const files = e.dataTransfer.files;
-            handleFiles(files);
-        });
+            setTimeout(() => {
+                try {
+                    const storedFiles = localStorage.getItem(CONFIG.STORAGE_KEY);
+                    state.uploadedFiles = storedFiles ? JSON.parse(storedFiles) : [];
+                    state.uploadedFiles.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+                    
+                    renderFilesList();
+                    updateFilesCount();
+                    
+                    elements.loadingFiles.style.display = 'none';
+                    
+                    if (state.uploadedFiles.length === 0) {
+                        elements.emptyState.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Error loading files:', error);
+                    state.uploadedFiles = [];
+                    elements.loadingFiles.style.display = 'none';
+                    elements.emptyState.style.display = 'block';
+                    showNotification('Error', 'Failed to load files', 'error');
+                }
+            }, 500);
+        }
         
-        fileInput.addEventListener('change', (e) => {
-            const files = e.target.files;
-            handleFiles(files);
-        });
+        function saveFiles() {
+            try {
+                localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state.uploadedFiles));
+                return true;
+            } catch (error) {
+                console.error('Error saving files:', error);
+                showNotification('Storage Error', 'Failed to save files', 'error');
+                return false;
+            }
+        }
         
-        uploadBtn.addEventListener('click', () => {
-            if (fileInput.files.length === 0) {
-                showNotification("Please select files first", "error");
+        function renderFilesList() {
+            elements.filesList.innerHTML = '';
+            
+            let filesToShow = state.uploadedFiles;
+            
+            if (state.currentFilter === 'classified') {
+                filesToShow = filesToShow.filter(file => file.classified);
+            } else if (state.currentFilter === 'csv') {
+                filesToShow = filesToShow.filter(file => file.name.toLowerCase().endsWith('.csv'));
+            }
+            
+            if (filesToShow.length === 0) {
+                elements.emptyState.style.display = 'block';
+                elements.bulkActions.style.display = 'none';
                 return;
             }
             
-            handleFiles(fileInput.files);
-            fileInput.value = '';
-        });
-        
-        downloadAllBtn.addEventListener('click', downloadAllAsCSV);
-        
-        // Handle uploaded files
-        function handleFiles(files) {
-            if (files.length === 0) return;
+            elements.emptyState.style.display = 'none';
             
-            for (let i = 0; i < files.length; i++) {
-                uploadFile(files[i]);
+            filesToShow.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = `file-item ${file.classified ? 'classified' : ''} fade-in`;
+                fileItem.dataset.id = file.id;
+                
+                const isSelected = state.selectedFiles.includes(file.id);
+                if (isSelected) {
+                    fileItem.style.borderColor = 'var(--gold)';
+                    fileItem.style.boxShadow = '0 5px 20px rgba(255, 215, 0, 0.2)';
+                }
+                
+                const fileIconClass = getFileIcon(file.name);
+                const fileType = getFileType(file.name);
+                const fileSize = formatFileSize(file.size);
+                const uploadDate = formatDate(file.uploadedAt);
+                
+                fileItem.innerHTML = `
+                    ${file.classified ? '<div class="classified-badge"><i class="fas fa-lock"></i> CLASSIFIED</div>' : ''}
+                    <div class="file-item-header">
+                        <div class="file-info">
+                            <div class="file-icon ${fileIconClass.split(' ')[0]}">
+                                <i class="${fileIconClass}"></i>
+                            </div>
+                            <div class="file-details">
+                                <h4>${file.name}</h4>
+                                <div class="file-meta">
+                                    <span><i class="fas fa-user"></i> ${file.uploaderName}</span>
+                                    <span><i class="fas fa-building"></i> ${file.organization}</span>
+                                    <span><i class="fas fa-tag"></i> ${file.purpose}</span>
+                                    <span><i class="fas fa-file"></i> ${fileType}</span>
+                                    <span><i class="fas fa-weight-hanging"></i> ${fileSize}</span>
+                                    <span><i class="fas fa-clock"></i> ${uploadDate}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="action-btn download-btn" onclick="downloadFileNow('${file.id}')">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="action-btn csv-btn" onclick="exportSingleFileCSVWithPassword('${file.id}')">
+                                <i class="fas fa-file-csv"></i> CSV
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteFile('${file.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="file-description">
+                        <div class="description-title">
+                            <i class="fas fa-align-left"></i> Description
+                        </div>
+                        <div class="description-text">
+                            ${file.description}
+                        </div>
+                    </div>
+                    
+                    <div class="uploader-info">
+                        <div class="uploader-details">
+                            <span><i class="fas fa-user-circle"></i> ${file.uploaderName}</span>
+                            <span><i class="fas fa-building"></i> ${file.organization}</span>
+                            <span><i class="fas fa-calendar"></i> Uploaded: ${uploadDate}</span>
+                            ${file.classified ? '<span style="color: var(--classified-red);"><i class="fas fa-lock"></i> Classified</span>' : ''}
+                        </div>
+                        <div>
+                            <input type="checkbox" class="file-select" data-id="${file.id}" ${isSelected ? 'checked' : ''} 
+                                   onchange="toggleFileSelection('${file.id}', this.checked)">
+                            <label>Select</label>
+                        </div>
+                    </div>
+                `;
+                
+                elements.filesList.appendChild(fileItem);
+            });
+            
+            if (state.uploadedFiles.length > 0) {
+                elements.bulkActions.style.display = 'flex';
             }
-            
-            // Reset file input
-            fileInput.value = '';
         }
         
-        // Initialize file list on page load
-        renderFileList();
-        
-        // Add CSS for shake animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
+        function updateFilesCount() {
+            let filesToCount = state.uploadedFiles;
+            
+            if (state.currentFilter === 'classified') {
+                filesToCount = filesToCount.filter(file => file.classified);
+            } else if (state.currentFilter === 'csv') {
+                filesToCount = filesToCount.filter(file => file.name.toLowerCase().endsWith('.csv'));
             }
-        `;
-        document.head.appendChild(style);
+            
+            const count = filesToCount.length;
+            elements.filesCount.textContent = `${count} File${count !== 1 ? 's' : ''}`;
+            elements.selectAllFiles.checked = state.allFilesSelected && count > 0;
+        }
+        
+        async function uploadFile(fileData) {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const fileId = generateId();
+                    
+                    let fileContent = null;
+                    if (fileData.file instanceof File) {
+                        fileContent = await readFileAsDataURL(fileData.file);
+                    }
+                    
+                    const fileObj = {
+                        id: fileId,
+                        name: fileData.name,
+                        size: fileData.size,
+                        type: fileData.type,
+                        uploaderName: fileData.uploaderName,
+                        organization: fileData.organization,
+                        purpose: fileData.purpose,
+                        description: fileData.description,
+                        classified: fileData.classified || false,
+                        uploadedAt: new Date().toISOString(),
+                        content: fileContent
+                    };
+                    
+                    state.uploadedFiles.unshift(fileObj);
+                    
+                    if (saveFiles()) {
+                        renderFilesList();
+                        updateFilesCount();
+                        state.selectedFiles = [];
+                        state.allFilesSelected = false;
+                        resolve(fileId);
+                    } else {
+                        reject(new Error('Failed to save file'));
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }
+        
+        function deleteFile(fileId) {
+            if (confirm('Permanently delete this file?')) {
+                const index = state.uploadedFiles.findIndex(f => f.id === fileId);
+                if (index !== -1) {
+                    const fileName = state.uploadedFiles[index].name;
+                    state.uploadedFiles.splice(index, 1);
+                    state.selectedFiles = state.selectedFiles.filter(id => id !== fileId);
+                    
+                    if (saveFiles()) {
+                        renderFilesList();
+                        updateFilesCount();
+                        showNotification('File Deleted', `"${fileName}" deleted`, 'success');
+                    } else {
+                        showNotification('Error', 'Failed to delete file', 'error');
+                    }
+                }
+            }
+        }
+        
+        function bulkDelete() {
+            const selectedCount = state.selectedFiles.length;
+            
+            if (selectedCount === 0) {
+                showNotification('No Selection', 'Please select files to delete', 'warning');
+                return;
+            }
+            
+            if (confirm(`Permanently delete ${selectedCount} files?`)) {
+                state.uploadedFiles = state.uploadedFiles.filter(file => !state.selectedFiles.includes(file.id));
+                state.selectedFiles = [];
+                state.allFilesSelected = false;
+                
+                if (saveFiles()) {
+                    renderFilesList();
+                    updateFilesCount();
+                    showNotification('Files Deleted', `${selectedCount} files deleted`, 'success');
+                } else {
+                    showNotification('Error', 'Failed to delete files', 'error');
+                }
+            }
+        }
+        
+        function toggleFileSelection(fileId, isSelected) {
+            if (isSelected) {
+                if (!state.selectedFiles.includes(fileId)) {
+                    state.selectedFiles.push(fileId);
+                }
+            } else {
+                state.selectedFiles = state.selectedFiles.filter(id => id !== fileId);
+                state.allFilesSelected = false;
+                elements.selectAllFiles.checked = false;
+            }
+            
+            const fileItem = document.querySelector(`.file-item[data-id="${fileId}"]`);
+            if (fileItem) {
+                if (isSelected) {
+                    fileItem.style.borderColor = 'var(--gold)';
+                    fileItem.style.boxShadow = '0 5px 20px rgba(255, 215, 0, 0.2)';
+                } else {
+                    fileItem.style.borderColor = 'transparent';
+                    fileItem.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+                }
+            }
+        }
+        
+        function selectAllFiles(isSelected) {
+            state.allFilesSelected = isSelected;
+            
+            if (isSelected) {
+                state.selectedFiles = state.uploadedFiles.map(file => file.id);
+            } else {
+                state.selectedFiles = [];
+            }
+            
+            document.querySelectorAll('.file-select').forEach(checkbox => {
+                checkbox.checked = isSelected;
+            });
+            
+            document.querySelectorAll('.file-item').forEach(item => {
+                if (isSelected) {
+                    item.style.borderColor = 'var(--gold)';
+                    item.style.boxShadow = '0 5px 20px rgba(255, 215, 0, 0.2)';
+                } else {
+                    item.style.borderColor = 'transparent';
+                    item.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+                }
+            });
+        }
+        
+        function applyFilter(filter) {
+            state.currentFilter = filter;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            renderFilesList();
+            updateFilesCount();
+        }
+        
+        let selectedFilesData = [];
+        
+        function resetUploadForm() {
+            elements.uploadForm.reset();
+            selectedFilesData = [];
+            elements.selectedFilesContainer.innerHTML = '';
+            elements.submitUpload.disabled = true;
+            elements.fileClassified.checked = false;
+            updateUserInfo();
+        }
+        
+        function updateUserInfo() {
+            const userName = sessionStorage.getItem('webcred_user');
+            const userOrg = sessionStorage.getItem('webcred_org');
+            
+            if (userName && userOrg) {
+                document.getElementById('uploader-name').value = userName;
+                document.getElementById('uploader-org').value = userOrg;
+            }
+        }
+        
+        function handleFileSelect(files) {
+            selectedFilesData = [];
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                if (file.size > CONFIG.MAX_FILE_SIZE) {
+                    showNotification('File Too Large', `"${file.name}" exceeds 50MB limit`, 'error');
+                    continue;
+                }
+                
+                if (!CONFIG.ALLOWED_TYPES.includes(file.type) && !file.name.match(/\.(csv|pdf|docx?|xlsx?|jpg|jpeg|png|gif|zip|txt)$/i)) {
+                    showNotification('Invalid File Type', `"${file.name}" type not allowed`, 'error');
+                    continue;
+                }
+                
+                selectedFilesData.push(file);
+            }
+            
+            displaySelectedFiles();
+            elements.submitUpload.disabled = selectedFilesData.length === 0;
+        }
+        
+        function displaySelectedFiles() {
+            elements.selectedFilesContainer.innerHTML = '';
+            
+            if (selectedFilesData.length === 0) {
+                return;
+            }
+            
+            selectedFilesData.forEach((file, index) => {
+                const fileElement = document.createElement('div');
+                fileElement.className = 'selected-file';
+                fileElement.innerHTML = `
+                    <div>
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${formatFileSize(file.size)}</div>
+                    </div>
+                    <button type="button" class="delete-btn" style="padding: 5px 10px;" onclick="removeSelectedFile(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                elements.selectedFilesContainer.appendChild(fileElement);
+            });
+        }
+        
+        function removeSelectedFile(index) {
+            selectedFilesData.splice(index, 1);
+            displaySelectedFiles();
+            elements.submitUpload.disabled = selectedFilesData.length === 0;
+        }
+        
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const uploaderName = document.getElementById('uploader-name').value.trim();
+            const organization = document.getElementById('uploader-org').value.trim();
+            const purpose = document.getElementById('file-purpose').value;
+            const description = document.getElementById('file-description').value.trim();
+            const classified = elements.fileClassified.checked;
+            
+            if (!uploaderName || !organization || !purpose || !description) {
+                showNotification('Missing Information', 'Please fill all fields', 'warning');
+                return;
+            }
+            
+            if (selectedFilesData.length === 0) {
+                showNotification('No File Selected', 'Please select at least one file', 'warning');
+                return;
+            }
+            
+            elements.submitUpload.disabled = true;
+            elements.submitUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            
+            try {
+                for (const file of selectedFilesData) {
+                    const fileData = {
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        uploaderName,
+                        organization,
+                        purpose,
+                        description,
+                        classified,
+                        file: file
+                    };
+                    
+                    await uploadFile(fileData);
+                }
+                
+                showNotification('Upload Successful', `${selectedFilesData.length} files uploaded`, 'success');
+                
+                resetUploadForm();
+                sessionStorage.setItem('webcred_user', uploaderName);
+                sessionStorage.setItem('webcred_org', organization);
+                updateUserDisplay();
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                showNotification('Upload Failed', 'Upload error occurred', 'error');
+            } finally {
+                elements.submitUpload.disabled = false;
+                elements.submitUpload.innerHTML = '<i class="fas fa-upload"></i> Upload File';
+            }
+        }
+        
+        // ========== EVENT LISTENERS ==========
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!checkAuth()) {
+                createStars();
+            }
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            updateUserInfo();
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    applyFilter(btn.dataset.filter);
+                });
+            });
+        });
+        
+        elements.loginBtn.addEventListener('click', login);
+        elements.passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+        
+        // Updated CSV export to require download password
+        elements.exportAllCsv.addEventListener('click', exportAllFilesCSVWithPassword);
+        
+        elements.logoutBtn.addEventListener('click', logout);
+        
+        elements.fileUploadArea.addEventListener('click', () => {
+            elements.fileInput.click();
+        });
+        
+        elements.fileInput.addEventListener('change', (e) => {
+            handleFileSelect(Array.from(e.target.files));
+        });
+        
+        elements.fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            elements.fileUploadArea.style.borderColor = 'var(--diamond)';
+            elements.fileUploadArea.style.background = 'rgba(255, 255, 255, 0.95)';
+            elements.fileUploadArea.style.transform = 'translateY(-5px)';
+        });
+        
+        elements.fileUploadArea.addEventListener('dragleave', () => {
+            elements.fileUploadArea.style.borderColor = 'var(--gold)';
+            elements.fileUploadArea.style.background = 'rgba(255, 255, 255, 0.8)';
+            elements.fileUploadArea.style.transform = 'translateY(0)';
+        });
+        
+        elements.fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            elements.fileUploadArea.style.borderColor = 'var(--gold)';
+            elements.fileUploadArea.style.background = 'rgba(255, 255, 255, 0.8)';
+            elements.fileUploadArea.style.transform = 'translateY(0)';
+            handleFileSelect(Array.from(e.dataTransfer.files));
+        });
+        
+        elements.uploadForm.addEventListener('submit', handleFormSubmit);
+        
+        elements.selectAllFiles.addEventListener('change', (e) => {
+            selectAllFiles(e.target.checked);
+        });
+        
+        // Updated bulk actions to require download password
+        elements.bulkDownload.addEventListener('click', bulkDownload);
+        elements.bulkCsv.addEventListener('click', exportSelectedFilesCSVWithPassword);
+        elements.bulkDelete.addEventListener('click', bulkDelete);
+        
+        // Download password overlay events
+        elements.confirmDownloadBtn.addEventListener('click', verifyDownloadPassword);
+        elements.cancelDownloadBtn.addEventListener('click', hideDownloadPasswordOverlay);
+        elements.downloadPasswordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verifyDownloadPassword();
+        });
+        
+        elements.notificationClose.addEventListener('click', hideNotification);
+        
+        // ========== EXPORT FUNCTIONS TO WINDOW OBJECT ==========
+        window.downloadFileNow = downloadFileNow;
+        window.deleteFile = deleteFile;
+        window.toggleFileSelection = toggleFileSelection;
+        window.removeSelectedFile = removeSelectedFile;
+        window.selectAllFiles = selectAllFiles;
+        window.exportSingleFileCSV = exportSingleFileCSVWithPassword; // Updated to use password-protected version
     </script>
 </body>
 </html>
