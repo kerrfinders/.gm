@@ -25,6 +25,8 @@
             --star-color: #fffacd;
             --classified-red: #d32f2f;
             --classified-bg: rgba(211, 47, 47, 0.1);
+            --admin-color: #8A2BE2;
+            --admin-bg: rgba(138, 43, 226, 0.1);
         }
         
         * {
@@ -675,6 +677,11 @@
             border-left: 5px solid var(--classified-red);
         }
         
+        .file-item.admin-deletable {
+            background: var(--admin-bg);
+            border-left: 5px solid var(--admin-color);
+        }
+        
         .file-item.classified .classified-badge {
             position: absolute;
             top: 10px;
@@ -792,6 +799,24 @@
             box-shadow: 0 5px 10px rgba(244, 67, 54, 0.3);
         }
         
+        .delete-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            background: linear-gradient(45deg, #cccccc, #999999);
+        }
+        
+        .admin-delete-btn {
+            background: linear-gradient(45deg, var(--admin-color), #5D21A0);
+            color: white;
+        }
+        
+        .admin-delete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(138, 43, 226, 0.3);
+        }
+        
         .file-description {
             margin-top: 15px;
             padding: 15px;
@@ -802,6 +827,10 @@
         
         .file-item.classified .file-description {
             background: rgba(211, 47, 47, 0.05);
+        }
+        
+        .file-item.admin-deletable .file-description {
+            background: rgba(138, 43, 226, 0.05);
         }
         
         .description-title {
@@ -891,6 +920,14 @@
             color: white;
         }
         
+        .bulk-delete-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            background: linear-gradient(45deg, #cccccc, #999999);
+        }
+        
         .bulk-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -956,6 +993,10 @@
             border-left-color: #ff9800;
         }
         
+        .notification.info {
+            border-left-color: var(--admin-color);
+        }
+        
         .notification-content {
             display: flex;
             align-items: center;
@@ -969,6 +1010,7 @@
         .notification.success .notification-icon { color: var(--green); }
         .notification.error .notification-icon { color: #f44336; }
         .notification.warning .notification-icon { color: #ff9800; }
+        .notification.info .notification-icon { color: var(--admin-color); }
         
         .notification-text h4 {
             font-weight: 600;
@@ -1140,6 +1182,24 @@
             font-size: 0.9rem;
         }
         
+        .admin-mode-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--admin-color), #5D21A0);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+            display: none;
+        }
+        
         @media (max-width: 768px) {
             .password-container {
                 padding: 30px;
@@ -1181,6 +1241,12 @@
             
             .download-password-buttons {
                 flex-direction: column;
+            }
+            
+            .admin-mode-badge {
+                top: 10px;
+                right: 10px;
+                font-size: 0.7rem;
             }
         }
     </style>
@@ -1236,6 +1302,11 @@
         </div>
     </div>
     
+    <!-- Admin Mode Badge -->
+    <div class="admin-mode-badge" id="admin-mode-badge">
+        <i class="fas fa-user-shield"></i> ADMIN MODE ACTIVE
+    </div>
+    
     <div id="main-content">
         <header>
             <div class="logo">
@@ -1255,6 +1326,9 @@
                 <div>
                     <p id="current-user">Portal Access: Active</p>
                     <p id="current-org">User: <span id="user-name">Guest</span></p>
+                    <p id="admin-status" style="font-size: 0.8rem; color: var(--admin-color); display: none;">
+                        <i class="fas fa-shield-alt"></i> Administrator Privileges
+                    </p>
                 </div>
             </div>
             
@@ -1271,8 +1345,11 @@
                 
                 <form id="upload-form" class="upload-form">
                     <div class="form-group">
-                        <label for="uploader-name"><i class="fas fa-user"></i> Your Name</label>
-                        <input type="text" id="uploader-name" placeholder="Enter your full name" required>
+                        <label for="uploader-name"><i class="fas fa-user"></i> Your Full Name</label>
+                        <input type="text" id="uploader-name" placeholder="Enter your full name (Required for file ownership)" required>
+                        <small style="color: #666; font-size: 0.85rem; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> This name will be used to identify you as the file owner
+                        </small>
                     </div>
                     
                     <div class="form-group">
@@ -1338,6 +1415,7 @@
                     <button class="filter-btn active" data-filter="all">All Files</button>
                     <button class="filter-btn" data-filter="classified">Classified Only</button>
                     <button class="filter-btn" data-filter="csv">CSV Files</button>
+                    <button class="filter-btn" data-filter="myfiles" id="my-files-filter">My Files Only</button>
                 </div>
                 
                 <div class="csv-download-container">
@@ -1372,7 +1450,7 @@
                         <button class="bulk-btn bulk-csv-btn" id="bulk-csv">
                             <i class="fas fa-file-csv"></i> Export Selected to CSV
                         </button>
-                        <button class="bulk-btn bulk-delete-btn" id="bulk-delete">
+                        <button class="bulk-btn bulk-delete-btn" id="bulk-delete" disabled>
                             <i class="fas fa-trash"></i> Delete Selected
                         </button>
                     </div>
@@ -1388,7 +1466,8 @@
                     <i class="fas fa-database"></i> Unlimited Storage Available | 
                     <i class="fas fa-shield-alt"></i> Dual Password Protection | 
                     <i class="fas fa-file-csv"></i> CSV Export Functionality |
-                    <i class="fas fa-lock"></i> Classified Files Support
+                    <i class="fas fa-lock"></i> Classified Files Support |
+                    <i class="fas fa-user-shield"></i> Admin-Only Deletion Protection
                 </p>
             </div>
         </footer>
@@ -1411,12 +1490,12 @@
         // ========== PASSWORD CONFIGURATION ==========
         const PASSWORDS = {
             PORTAL: "gambia@2025",          // For accessing the portal
-            DOWNLOAD: "gambia@@2025"        // For downloading files
+            DOWNLOAD: "gambia@@@2025"       // For downloading files and admin privileges
         };
         // ============================================
         
         const CONFIG = {
-            STORAGE_KEY: "KERR FINDERS_files",
+            STORAGE_KEY: "kerr_finders_files",
             MAX_FILE_SIZE: 50 * 1024 * 1024,
             ALLOWED_TYPES: [
                 'text/csv',
@@ -1443,8 +1522,10 @@
             allFilesSelected: false,
             currentFilter: 'all',
             downloadPasswordVerified: false,
-            pendingDownloadAction: null, // Store download function to execute after password verification
-            pendingDownloadParams: null  // Store parameters for the download function
+            pendingDownloadAction: null,
+            pendingDownloadParams: null,
+            isAdminMode: false,
+            adminModeExpiry: null
         };
         
         const elements = {
@@ -1475,13 +1556,15 @@
             notificationMessage: document.getElementById('notification-message'),
             currentUserDisplay: document.getElementById('current-user'),
             userNameDisplay: document.getElementById('user-name'),
+            adminStatus: document.getElementById('admin-status'),
             fileClassified: document.getElementById('file-classified'),
-            // Download password elements
             downloadPasswordOverlay: document.getElementById('download-password-overlay'),
             downloadPasswordInput: document.getElementById('download-password-input'),
             confirmDownloadBtn: document.getElementById('confirm-download-btn'),
             cancelDownloadBtn: document.getElementById('cancel-download-btn'),
-            downloadPasswordError: document.getElementById('download-password-error')
+            downloadPasswordError: document.getElementById('download-password-error'),
+            adminModeBadge: document.getElementById('admin-mode-badge'),
+            myFilesFilter: document.getElementById('my-files-filter')
         };
         
         function createStars() {
@@ -1571,7 +1654,7 @@
             });
         }
         
-        function downloadCSV(files, filename = 'webcred_files') {
+        function downloadCSV(files, filename = 'kerr_finders_files') {
             if (files.length === 0) {
                 showNotification('No Files', 'No files to export', 'warning');
                 return;
@@ -1635,7 +1718,7 @@
                 state.selectedFiles.includes(file.id)
             );
             
-            downloadCSV(filesToExport, 'webcred_selected_files');
+            downloadCSV(filesToExport, 'kerr_finders_selected_files');
         }
         
         function exportAllFilesCSV() {
@@ -1645,6 +1728,8 @@
                 filesToExport = filesToExport.filter(file => file.classified);
             } else if (state.currentFilter === 'csv') {
                 filesToExport = filesToExport.filter(file => file.name.toLowerCase().endsWith('.csv'));
+            } else if (state.currentFilter === 'myfiles') {
+                filesToExport = filesToExport.filter(file => file.uploaderName === state.currentUser);
             }
             
             if (filesToExport.length === 0) {
@@ -1652,20 +1737,36 @@
                 return;
             }
             
-            downloadCSV(filesToExport, 'webcred_all_files');
+            downloadCSV(filesToExport, 'kerr_finders_all_files');
         }
         
         // ========== PASSWORD VERIFICATION FUNCTIONS ==========
         
         function checkAuth() {
-            const isLoggedIn = sessionStorage.getItem('webcred_logged_in') === 'true';
-            const user = sessionStorage.getItem('webcred_user');
-            const org = sessionStorage.getItem('webcred_org');
+            const isLoggedIn = sessionStorage.getItem('kerr_finders_logged_in') === 'true';
+            const user = sessionStorage.getItem('kerr_finders_user');
+            const org = sessionStorage.getItem('kerr_finders_org');
+            const adminMode = sessionStorage.getItem('kerr_finders_admin_mode') === 'true';
+            const adminExpiry = sessionStorage.getItem('kerr_finders_admin_expiry');
             
             if (isLoggedIn && user && org) {
                 state.isAuthenticated = true;
                 state.currentUser = user;
                 state.currentOrg = org;
+                
+                // Check if admin mode is still valid
+                if (adminMode && adminExpiry) {
+                    const expiryTime = parseInt(adminExpiry);
+                    if (Date.now() < expiryTime) {
+                        state.isAdminMode = true;
+                        state.adminModeExpiry = expiryTime;
+                        elements.adminModeBadge.style.display = 'flex';
+                        elements.adminStatus.style.display = 'block';
+                    } else {
+                        sessionStorage.removeItem('kerr_finders_admin_mode');
+                        sessionStorage.removeItem('kerr_finders_admin_expiry');
+                    }
+                }
                 
                 elements.passwordOverlay.style.display = 'none';
                 elements.mainContent.style.display = 'block';
@@ -1680,18 +1781,17 @@
         function login() {
             const password = elements.passwordInput.value.trim();
             
-            // Changed from PASSWORDS.DOWNLOAD to PASSWORDS.PORTAL
             if (password === PASSWORDS.PORTAL) {
-                const userName = document.getElementById('uploader-name').value || 'WebCred User';
-                const userOrg = document.getElementById('uploader-org').value || 'WebCred Solutions';
+                const userName = document.getElementById('uploader-name').value || 'KERR FINDERS User';
+                const userOrg = document.getElementById('uploader-org').value || 'KERR FINDERS';
                 
                 state.isAuthenticated = true;
                 state.currentUser = userName;
                 state.currentOrg = userOrg;
                 
-                sessionStorage.setItem('webcred_logged_in', 'true');
-                sessionStorage.setItem('webcred_user', userName);
-                sessionStorage.setItem('webcred_org', userOrg);
+                sessionStorage.setItem('kerr_finders_logged_in', 'true');
+                sessionStorage.setItem('kerr_finders_user', userName);
+                sessionStorage.setItem('kerr_finders_org', userOrg);
                 
                 elements.passwordOverlay.style.opacity = '0';
                 setTimeout(() => {
@@ -1700,7 +1800,7 @@
                     createStars();
                     updateUserDisplay();
                     loadFiles();
-                    showNotification('Access Granted', 'Welcome to WebCred Solutions', 'success');
+                    showNotification('Access Granted', 'Welcome to KERR FINDERS', 'success');
                 }, 300);
                 
                 elements.passwordInput.value = '';
@@ -1723,7 +1823,6 @@
         function showDownloadPasswordOverlay(downloadAction, params = null) {
             state.pendingDownloadAction = downloadAction;
             state.pendingDownloadParams = params;
-            state.downloadPasswordVerified = false;
             
             elements.downloadPasswordInput.value = '';
             elements.downloadPasswordError.textContent = '';
@@ -1744,6 +1843,20 @@
             
             if (password === PASSWORDS.DOWNLOAD) {
                 state.downloadPasswordVerified = true;
+                
+                // Activate admin mode
+                state.isAdminMode = true;
+                const expiryTime = Date.now() + 300000; // 5 minutes
+                state.adminModeExpiry = expiryTime;
+                
+                // Store admin mode in session storage
+                sessionStorage.setItem('kerr_finders_admin_mode', 'true');
+                sessionStorage.setItem('kerr_finders_admin_expiry', expiryTime.toString());
+                
+                // Show admin mode badge
+                elements.adminModeBadge.style.display = 'flex';
+                elements.adminStatus.style.display = 'block';
+                
                 hideDownloadPasswordOverlay();
                 
                 // Execute the pending download action
@@ -1755,10 +1868,10 @@
                     }
                 }
                 
-                // Reset after a delay
-                setTimeout(() => {
-                    state.downloadPasswordVerified = false;
-                }, 300000); // Password stays valid for 5 minutes
+                showNotification('Admin Mode Activated', 'You now have administrator privileges for 5 minutes', 'info');
+                
+                // Update the file list to show delete buttons for admin
+                renderFilesList();
                 
                 return true;
             } else {
@@ -1780,8 +1893,8 @@
         // ========== MODIFIED DOWNLOAD FUNCTIONS WITH PASSWORD CHECK ==========
         
         function downloadFileNow(fileId) {
-            // Check if download password is already verified
-            if (state.downloadPasswordVerified) {
+            // Check if download password is already verified (admin mode)
+            if (state.isAdminMode) {
                 executeDownloadFile(fileId);
             } else {
                 showDownloadPasswordOverlay(executeDownloadFile, fileId);
@@ -1804,7 +1917,7 @@
                     link.click();
                     document.body.removeChild(link);
                 } else {
-                    const content = `WebCred Solutions - File Information\n\n` +
+                    const content = `KERR FINDERS - File Information\n\n` +
                                    `File Name: ${file.name}\n` +
                                    `Uploaded By: ${file.uploaderName}\n` +
                                    `Organization: ${file.organization}\n` +
@@ -1831,7 +1944,7 @@
         }
         
         function bulkDownload() {
-            if (state.downloadPasswordVerified) {
+            if (state.isAdminMode) {
                 executeBulkDownload();
             } else {
                 showDownloadPasswordOverlay(executeBulkDownload);
@@ -1870,7 +1983,7 @@
                 const encodedUri = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
                 const link = document.createElement('a');
                 link.setAttribute('href', encodedUri);
-                link.setAttribute('download', `webcred_export_${new Date().toISOString().split('T')[0]}.txt`);
+                link.setAttribute('download', `kerr_finders_export_${new Date().toISOString().split('T')[0]}.txt`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -1881,7 +1994,7 @@
         
         // CSV exports also require download password
         function exportSingleFileCSVWithPassword(fileId) {
-            if (state.downloadPasswordVerified) {
+            if (state.isAdminMode) {
                 exportSingleFileCSV(fileId);
             } else {
                 showDownloadPasswordOverlay(exportSingleFileCSV, fileId);
@@ -1889,7 +2002,7 @@
         }
         
         function exportSelectedFilesCSVWithPassword() {
-            if (state.downloadPasswordVerified) {
+            if (state.isAdminMode) {
                 exportSelectedFilesCSV();
             } else {
                 showDownloadPasswordOverlay(exportSelectedFilesCSV);
@@ -1897,26 +2010,151 @@
         }
         
         function exportAllFilesCSVWithPassword() {
-            if (state.downloadPasswordVerified) {
+            if (state.isAdminMode) {
                 exportAllFilesCSV();
             } else {
                 showDownloadPasswordOverlay(exportAllFilesCSV);
             }
         }
         
-        // ========== END OF MODIFIED DOWNLOAD FUNCTIONS ==========
+        // ========== ENHANCED DELETE FUNCTIONS ==========
+        
+        function canDeleteFile(file) {
+            // Admin can delete any file
+            if (state.isAdminMode) {
+                return true;
+            }
+            
+            // User can delete their own files
+            if (file.uploaderName === state.currentUser) {
+                return true;
+            }
+            
+            return false;
+        }
+        
+        function deleteFile(fileId) {
+            const file = state.uploadedFiles.find(f => f.id === fileId);
+            if (!file) {
+                showNotification('Error', 'File not found', 'error');
+                return;
+            }
+            
+            if (!canDeleteFile(file)) {
+                if (state.isAdminMode) {
+                    showNotification('Permission Denied', 'Only administrators can delete other users\' files', 'error');
+                } else {
+                    showNotification('Permission Denied', 'You can only delete your own files', 'error');
+                }
+                return;
+            }
+            
+            let confirmMessage = 'Permanently delete this file?';
+            if (state.isAdminMode && file.uploaderName !== state.currentUser) {
+                confirmMessage = `ADMIN ACTION: Permanently delete "${file.name}" uploaded by ${file.uploaderName}?`;
+            }
+            
+            if (confirm(confirmMessage)) {
+                const index = state.uploadedFiles.findIndex(f => f.id === fileId);
+                if (index !== -1) {
+                    const fileName = state.uploadedFiles[index].name;
+                    state.uploadedFiles.splice(index, 1);
+                    state.selectedFiles = state.selectedFiles.filter(id => id !== fileId);
+                    
+                    if (saveFiles()) {
+                        renderFilesList();
+                        updateFilesCount();
+                        
+                        if (state.isAdminMode && file.uploaderName !== state.currentUser) {
+                            showNotification('File Deleted', `"${fileName}" (uploaded by ${file.uploaderName}) deleted by administrator`, 'info');
+                        } else {
+                            showNotification('File Deleted', `"${fileName}" deleted`, 'success');
+                        }
+                    } else {
+                        showNotification('Error', 'Failed to delete file', 'error');
+                    }
+                }
+            }
+        }
+        
+        function bulkDelete() {
+            // Only admin can perform bulk delete
+            if (!state.isAdminMode) {
+                showNotification('Permission Denied', 'Only administrators can perform bulk delete operations', 'error');
+                return;
+            }
+            
+            const selectedCount = state.selectedFiles.length;
+            
+            if (selectedCount === 0) {
+                showNotification('No Selection', 'Please select files to delete', 'warning');
+                return;
+            }
+            
+            // Get files to delete
+            const filesToDelete = state.uploadedFiles.filter(file => 
+                state.selectedFiles.includes(file.id)
+            );
+            
+            let adminDeleteCount = 0;
+            let ownDeleteCount = 0;
+            
+            filesToDelete.forEach(file => {
+                if (file.uploaderName === state.currentUser) {
+                    ownDeleteCount++;
+                } else {
+                    adminDeleteCount++;
+                }
+            });
+            
+            let confirmMessage = `Permanently delete ${selectedCount} files?`;
+            if (adminDeleteCount > 0) {
+                confirmMessage = `ADMIN ACTION: Delete ${selectedCount} files?\n`;
+                if (ownDeleteCount > 0) {
+                    confirmMessage += `- ${ownDeleteCount} of your own files\n`;
+                }
+                if (adminDeleteCount > 0) {
+                    confirmMessage += `- ${adminDeleteCount} files uploaded by other users`;
+                }
+            }
+            
+            if (confirm(confirmMessage)) {
+                state.uploadedFiles = state.uploadedFiles.filter(file => !state.selectedFiles.includes(file.id));
+                state.selectedFiles = [];
+                state.allFilesSelected = false;
+                
+                if (saveFiles()) {
+                    renderFilesList();
+                    updateFilesCount();
+                    
+                    let message = `${selectedCount} files deleted`;
+                    if (adminDeleteCount > 0) {
+                        message = `${selectedCount} files deleted (${adminDeleteCount} by admin authority)`;
+                    }
+                    showNotification('Files Deleted', message, 'info');
+                } else {
+                    showNotification('Error', 'Failed to delete files', 'error');
+                }
+            }
+        }
+        
+        // ========== END OF MODIFIED DELETE FUNCTIONS ==========
         
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
-                sessionStorage.removeItem('webcred_logged_in');
-                sessionStorage.removeItem('webcred_user');
-                sessionStorage.removeItem('webcred_org');
+                sessionStorage.removeItem('kerr_finders_logged_in');
+                sessionStorage.removeItem('kerr_finders_user');
+                sessionStorage.removeItem('kerr_finders_org');
+                sessionStorage.removeItem('kerr_finders_admin_mode');
+                sessionStorage.removeItem('kerr_finders_admin_expiry');
                 
                 state.isAuthenticated = false;
                 state.currentUser = null;
                 state.currentOrg = null;
                 state.selectedFiles = [];
                 state.downloadPasswordVerified = false;
+                state.isAdminMode = false;
+                state.adminModeExpiry = null;
                 
                 elements.mainContent.style.display = 'none';
                 elements.passwordOverlay.style.display = 'flex';
@@ -1924,6 +2162,8 @@
                 elements.passwordInput.value = '';
                 elements.passwordError.textContent = '';
                 elements.passwordInput.style.borderColor = 'var(--gold)';
+                elements.adminModeBadge.style.display = 'none';
+                elements.adminStatus.style.display = 'none';
                 
                 resetUploadForm();
                 showNotification('Logged Out', 'You have been logged out', 'success');
@@ -1985,6 +2225,8 @@
                 filesToShow = filesToShow.filter(file => file.classified);
             } else if (state.currentFilter === 'csv') {
                 filesToShow = filesToShow.filter(file => file.name.toLowerCase().endsWith('.csv'));
+            } else if (state.currentFilter === 'myfiles') {
+                filesToShow = filesToShow.filter(file => file.uploaderName === state.currentUser);
             }
             
             if (filesToShow.length === 0) {
@@ -2000,6 +2242,12 @@
                 fileItem.className = `file-item ${file.classified ? 'classified' : ''} fade-in`;
                 fileItem.dataset.id = file.id;
                 
+                // Check if this file is deletable by admin but not by current user
+                const isAdminDeletable = state.isAdminMode && file.uploaderName !== state.currentUser;
+                if (isAdminDeletable) {
+                    fileItem.classList.add('admin-deletable');
+                }
+                
                 const isSelected = state.selectedFiles.includes(file.id);
                 if (isSelected) {
                     fileItem.style.borderColor = 'var(--gold)';
@@ -2011,8 +2259,12 @@
                 const fileSize = formatFileSize(file.size);
                 const uploadDate = formatDate(file.uploadedAt);
                 
+                // Check if current user can delete this file
+                const canDelete = canDeleteFile(file);
+                
                 fileItem.innerHTML = `
                     ${file.classified ? '<div class="classified-badge"><i class="fas fa-lock"></i> CLASSIFIED</div>' : ''}
+                    ${isAdminDeletable ? '<div class="classified-badge" style="background: var(--admin-color); top: 40px;"><i class="fas fa-user-shield"></i> ADMIN DELETE ONLY</div>' : ''}
                     <div class="file-item-header">
                         <div class="file-info">
                             <div class="file-icon ${fileIconClass.split(' ')[0]}">
@@ -2037,9 +2289,15 @@
                             <button class="action-btn csv-btn" onclick="exportSingleFileCSVWithPassword('${file.id}')">
                                 <i class="fas fa-file-csv"></i> CSV
                             </button>
-                            <button class="action-btn delete-btn" onclick="deleteFile('${file.id}')">
-                                <i class="fas fa-trash"></i> Delete
+                            ${canDelete ? `
+                            <button class="action-btn ${isAdminDeletable ? 'admin-delete-btn' : 'delete-btn'}" onclick="deleteFile('${file.id}')">
+                                <i class="fas fa-trash"></i> ${isAdminDeletable ? 'Admin Delete' : 'Delete'}
                             </button>
+                            ` : `
+                            <button class="action-btn delete-btn" disabled title="You can only delete your own files">
+                                <i class="fas fa-ban"></i> Delete
+                            </button>
+                            `}
                         </div>
                     </div>
                     
@@ -2058,6 +2316,7 @@
                             <span><i class="fas fa-building"></i> ${file.organization}</span>
                             <span><i class="fas fa-calendar"></i> Uploaded: ${uploadDate}</span>
                             ${file.classified ? '<span style="color: var(--classified-red);"><i class="fas fa-lock"></i> Classified</span>' : ''}
+                            ${file.uploaderName === state.currentUser ? '<span style="color: var(--green);"><i class="fas fa-check-circle"></i> Your File</span>' : ''}
                         </div>
                         <div>
                             <input type="checkbox" class="file-select" data-id="${file.id}" ${isSelected ? 'checked' : ''} 
@@ -2072,6 +2331,14 @@
             
             if (state.uploadedFiles.length > 0) {
                 elements.bulkActions.style.display = 'flex';
+                
+                // Enable/disable bulk delete button based on admin mode
+                elements.bulkDelete.disabled = !state.isAdminMode;
+                if (state.isAdminMode) {
+                    elements.bulkDelete.title = "Admin can delete selected files";
+                } else {
+                    elements.bulkDelete.title = "Only administrators can perform bulk delete";
+                }
             }
         }
         
@@ -2082,6 +2349,8 @@
                 filesToCount = filesToCount.filter(file => file.classified);
             } else if (state.currentFilter === 'csv') {
                 filesToCount = filesToCount.filter(file => file.name.toLowerCase().endsWith('.csv'));
+            } else if (state.currentFilter === 'myfiles') {
+                filesToCount = filesToCount.filter(file => file.uploaderName === state.currentUser);
             }
             
             const count = filesToCount.length;
@@ -2130,48 +2399,6 @@
             });
         }
         
-        function deleteFile(fileId) {
-            if (confirm('Permanently delete this file?')) {
-                const index = state.uploadedFiles.findIndex(f => f.id === fileId);
-                if (index !== -1) {
-                    const fileName = state.uploadedFiles[index].name;
-                    state.uploadedFiles.splice(index, 1);
-                    state.selectedFiles = state.selectedFiles.filter(id => id !== fileId);
-                    
-                    if (saveFiles()) {
-                        renderFilesList();
-                        updateFilesCount();
-                        showNotification('File Deleted', `"${fileName}" deleted`, 'success');
-                    } else {
-                        showNotification('Error', 'Failed to delete file', 'error');
-                    }
-                }
-            }
-        }
-        
-        function bulkDelete() {
-            const selectedCount = state.selectedFiles.length;
-            
-            if (selectedCount === 0) {
-                showNotification('No Selection', 'Please select files to delete', 'warning');
-                return;
-            }
-            
-            if (confirm(`Permanently delete ${selectedCount} files?`)) {
-                state.uploadedFiles = state.uploadedFiles.filter(file => !state.selectedFiles.includes(file.id));
-                state.selectedFiles = [];
-                state.allFilesSelected = false;
-                
-                if (saveFiles()) {
-                    renderFilesList();
-                    updateFilesCount();
-                    showNotification('Files Deleted', `${selectedCount} files deleted`, 'success');
-                } else {
-                    showNotification('Error', 'Failed to delete files', 'error');
-                }
-            }
-        }
-        
         function toggleFileSelection(fileId, isSelected) {
             if (isSelected) {
                 if (!state.selectedFiles.includes(fileId)) {
@@ -2199,7 +2426,18 @@
             state.allFilesSelected = isSelected;
             
             if (isSelected) {
-                state.selectedFiles = state.uploadedFiles.map(file => file.id);
+                // Only select files that are visible based on current filter
+                let filesToShow = state.uploadedFiles;
+                
+                if (state.currentFilter === 'classified') {
+                    filesToShow = filesToShow.filter(file => file.classified);
+                } else if (state.currentFilter === 'csv') {
+                    filesToShow = filesToShow.filter(file => file.name.toLowerCase().endsWith('.csv'));
+                } else if (state.currentFilter === 'myfiles') {
+                    filesToShow = filesToShow.filter(file => file.uploaderName === state.currentUser);
+                }
+                
+                state.selectedFiles = filesToShow.map(file => file.id);
             } else {
                 state.selectedFiles = [];
             }
@@ -2232,6 +2470,13 @@
             
             renderFilesList();
             updateFilesCount();
+            
+            // Reset selection when filter changes
+            state.selectedFiles = [];
+            state.allFilesSelected = false;
+            document.querySelectorAll('.file-select').forEach(checkbox => {
+                checkbox.checked = false;
+            });
         }
         
         let selectedFilesData = [];
@@ -2246,8 +2491,8 @@
         }
         
         function updateUserInfo() {
-            const userName = sessionStorage.getItem('webcred_user');
-            const userOrg = sessionStorage.getItem('webcred_org');
+            const userName = sessionStorage.getItem('kerr_finders_user');
+            const userOrg = sessionStorage.getItem('kerr_finders_org');
             
             if (userName && userOrg) {
                 document.getElementById('uploader-name').value = userName;
@@ -2348,9 +2593,13 @@
                 
                 showNotification('Upload Successful', `${selectedFilesData.length} files uploaded`, 'success');
                 
+                // Update current user in state and session storage
+                state.currentUser = uploaderName;
+                state.currentOrg = organization;
+                sessionStorage.setItem('kerr_finders_user', uploaderName);
+                sessionStorage.setItem('kerr_finders_org', organization);
+                
                 resetUploadForm();
-                sessionStorage.setItem('webcred_user', uploaderName);
-                sessionStorage.setItem('webcred_org', organization);
                 updateUserDisplay();
                 
             } catch (error) {
@@ -2386,6 +2635,24 @@
                     applyFilter(btn.dataset.filter);
                 });
             });
+            
+            // Check admin mode expiry every minute
+            setInterval(() => {
+                if (state.isAdminMode && state.adminModeExpiry && Date.now() > state.adminModeExpiry) {
+                    state.isAdminMode = false;
+                    state.adminModeExpiry = null;
+                    sessionStorage.removeItem('kerr_finders_admin_mode');
+                    sessionStorage.removeItem('kerr_finders_admin_expiry');
+                    
+                    elements.adminModeBadge.style.display = 'none';
+                    elements.adminStatus.style.display = 'none';
+                    
+                    showNotification('Admin Mode Expired', 'Administrator privileges have expired', 'warning');
+                    
+                    // Re-render files to remove admin delete buttons
+                    renderFilesList();
+                }
+            }, 60000); // Check every minute
         });
         
         elements.loginBtn.addEventListener('click', login);
